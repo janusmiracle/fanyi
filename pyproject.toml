@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "fanyi"
+version = "0.1.0"
+description = "Improve NLP-based machine-generated novel translations through the application of transfer learning."
+authors = ["janusmiracle <janusmiracle@outlook.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python="3.11.1"
+torch = "2.2.1"
+torchvision = "0.17.1"
+tensorflow = "^2.15.0"
+flax = "^0.8.1"
+sacremoses = "^0.1.1"
+transformers = "^4.38.2"
+sentencepiece = "^0.2.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
