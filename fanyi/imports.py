@@ -20,14 +20,14 @@ def import_raws(
     auto_clean: Optional[bool] = False,
 ) -> Optional[Path]:
     """
-    Imports translations text files from a source directory into the 'translations' directory.
+    Imports raw text files from a source directory into the 'raws' directory.
 
     Parameters
     ----------
     source_directory : Path
         Path to the directory containing text files to be imported.
     source_name : str
-        Name for the output directory within the 'translations' directory.
+        Name for the output directory within the 'raws' directory.
     auto_clean : Optional[bool]
         Whether to automatically clean source_name if it contains illegal characters. (Defaults to False)
 
@@ -49,7 +49,7 @@ def import_raws(
 
     logging.info("\nImport validation successful.")
 
-    # Create subdirectory within 'translations'
+    # Create subdirectory within 'raws'
     if output_directory is not None:
         os.makedirs(output_directory, exist_ok=True)
 
@@ -70,7 +70,7 @@ def import_translations(
     auto_clean: Optional[bool] = False,
 ) -> Optional[Path]:
     """
-    Imports translations text files from a source directory into the 'translations' directory.
+    Imports corresponding translated text files from a source directory into the 'translations' directory.
 
     Parameters
     ----------
@@ -97,7 +97,7 @@ def import_translations(
     if validation_errors:
         raise ValidationError("Validation failed.", errors=validation_errors)
 
-    # Create subdirectory within 'raws'
+    # Create subdirectory within 'translations'
     if output_directory is not None:
         os.makedirs(output_directory, exist_ok=True)
 
