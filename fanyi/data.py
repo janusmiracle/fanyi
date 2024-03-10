@@ -1,38 +1,82 @@
-from pathlib import Path
-from nltk.tokenize import sent_tokenize
-from typing import Generator, Dict, List
+import itertools
+import os
 
+from pathlib import Path
+from typing import Generator, Dict, Optional
 from fanyi.utils import sort_files
 
 # nltk.download('punkt')
 
 
-def load_data(directory: Path | None) -> Generator[Dict[str, List[str]], None, None]:
+def load_data(
+    raw_directory: Optional[Path],
+    translated_directory: Optional[Path],
+    limit: Optional[int],
+) -> Generator[Dict[str, str], None, None]:
     """
-    Lazy load text files from a directory and yield a dictionary
-    containing the filename and the raw text of each file.
+    Lazy load raw and translated text files from directories and yield a dictionary
+    containing the filename and the raw and translated text of each file.
 
     Parameters
     ----------
-    directory : Path
-        Path to the directory containing the text files.
+    raw_directory : Optional[Path]
+        Path to the directory containing the raw text files.
+    translated_directory : Optional[Path]
+        Path to the directory containing the translated text files.
+    limit : Optional[int]
+        Maximum number of files to load, by default None (load all files).
 
     Yields
     -------
-    Dict[str, List[str]]
-        A dictionary containing the filename and the raw text of each file.
+    Dict[str, str]
+         A dictionary containing the filename and the raw and translated text of each file.
+
+    Raises
+    ------
+    FileNotFoundError
+        If the specified directories do not exist.
     """
-    if directory is None or not directory.exists():
-        raise FileNotFoundError("Directory does not exist.")
+    if (
+        raw_directory is None
+        or not raw_directory.exists()
+        or translated_directory is None
+        or not translated_directory.exists()
+    ):
+        raise FileNotFoundError("Directories do not exist.")
 
-    # Sort directory to ensure consistent order after importing
-    sort_files(directory)
+    # Sort directories to ensure consistent ordering after importing
+    raw_files = sort_files(raw_directory)
+    translated_files = sort_files(translated_directory)
 
-    for file_path in directory.iterdir():
-        if file_path.is_file() and file_path.suffix == ".txt":
-            with open(file_path, "r", encoding="utf-8") as file:
-                text_data = file.read()
+    if limit:
+        raw_files = itertools.islice(raw_files, limit)
+        translated_files = itertools.islice(translated_files, limit)
 
-            sentences = sent_tokenize(text_data)
-            for sentence in sentences:
-                yield {file_path.name: sentence}
+    for raw_path, translated_path in zip(raw_files, translated_files):
+        if (
+            raw_path.is_file()
+            and raw_path.suffix == ".txt"
+            and translated_path.is_file()
+            and translated_path.suffix == ".txt"
+        ):
+            with open(raw_path, "r", encoding="utf-8") as raw_file, open(
+                translated_path, "r", encoding="utf-8"
+            ) as translated_file:
+                raw_text_data = raw_file.read()
+                translated_text_data = translated_file.read()
+
+            yield {
+                "raw_filename": raw_path.name,
+                "raw_text": raw_text_data,
+                "translated_filename": translated_path.name,
+                "translated_text": translated_text_data,
+            }
+
+
+if __name__ == "__main__":
+    for data in load_data(
+        Path(os.getcwd() + "/tests/custom_dataset/korean/raws/"),
+        Path(os.getcwd() + "/tests/custom_dataset/korean/translations/"),
+        limit=10,
+    ):
+        print(data, "\n\n")

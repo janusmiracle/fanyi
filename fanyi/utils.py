@@ -2,6 +2,11 @@ import re
 
 from natsort import natsorted
 from pathlib import Path
+from typing import List
+
+
+def bleu_score():
+    return
 
 
 def clean_invalid(name: str) -> str:
@@ -21,7 +26,7 @@ def clean_invalid(name: str) -> str:
     return re.sub(r"[^\w\s\-\(\)\[\]]", "", name)
 
 
-def sort_files(path: Path) -> None:
+def sort_files(path: Path) -> List[Path]:
     """
     Sort text files in a directory using natural sorting.
 
@@ -30,4 +35,6 @@ def sort_files(path: Path) -> None:
     path : Path
         Path leading to directory.
     """
-    natsorted(path.iterdir())
+    files = path.iterdir()
+    sorted_files = natsorted(files)
+    return list(sorted_files)
