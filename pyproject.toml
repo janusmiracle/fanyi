@@ -14,6 +14,8 @@ flax = "^0.8.1"
 sacremoses = "^0.1.1"
 transformers = "^4.38.2"
 sentencepiece = "^0.2.0"
+natsort = "^8.4.0"
+nltk = "^3.8.1"
 
 
 [build-system]

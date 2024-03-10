@@ -1,9 +1,7 @@
 import re
 
-# import natsort
+from natsort import natsorted
 from pathlib import Path
-
-# Utility functions
 
 
 def clean_invalid(name: str) -> str:
@@ -32,5 +30,4 @@ def sort_files(path: Path) -> None:
     path : Path
         Path leading to directory.
     """
-
-    return
+    natsorted(path.iterdir())

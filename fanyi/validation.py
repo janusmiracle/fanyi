@@ -1,11 +1,11 @@
 import os
 import re
 
-from .errors import EmptyDirectoryError, InvalidCharacterError
-from .paths import RAWS_PATH, TRANSLATIONS_PATH
+from fanyi.errors import EmptyDirectoryError, InvalidCharacterError
+from fanyi.paths import RAWS_PATH, TRANSLATIONS_PATH
 from pathlib import Path
 from typing import Tuple, List, Optional
-from .utils import clean_invalid
+from fanyi.utils import clean_invalid
 
 
 def import_validation(

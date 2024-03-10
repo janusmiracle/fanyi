@@ -1,13 +1,13 @@
-import os
-
 from pathlib import Path
-from typing import Generator, Dict
-from fanyi.file_manager import import_raws
+from nltk.tokenize import sent_tokenize
+from typing import Generator, Dict, List
 
-# Load data from 'raws' and 'translations'
+from fanyi.utils import sort_files
+
+# nltk.download('punkt')
 
 
-def load_data(directory: Path | None) -> Generator[Dict[str, str], None, None]:
+def load_data(directory: Path | None) -> Generator[Dict[str, List[str]], None, None]:
     """
     Lazy load text files from a directory and yield a dictionary
     containing the filename and the raw text of each file.
@@ -19,21 +19,20 @@ def load_data(directory: Path | None) -> Generator[Dict[str, str], None, None]:
 
     Yields
     -------
-    Dict[str, str]
+    Dict[str, List[str]]
         A dictionary containing the filename and the raw text of each file.
     """
     if directory is None or not directory.exists():
         raise FileNotFoundError("Directory does not exist.")
+
+    # Sort directory to ensure consistent order after importing
+    sort_files(directory)
 
     for file_path in directory.iterdir():
         if file_path.is_file() and file_path.suffix == ".txt":
             with open(file_path, "r", encoding="utf-8") as file:
                 text_data = file.read()
 
-            yield {file_path.name: text_data}
-
-
-if __name__ == "__main__":
-    directory = import_raws(Path(os.getcwd() + "/tests/test_files/raws/"), "test_raws")
-    for file_data in load_data(directory):
-        print(file_data, "\n")
+            sentences = sent_tokenize(text_data)
+            for sentence in sentences:
+                yield {file_path.name: sentence}
