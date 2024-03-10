@@ -39,7 +39,7 @@ def import_raws(
     validation_errors, source_name, output_directory = import_validation(
         source_directory,
         source_name,
-        "import_raws",
+        str(import_raws.__name__),
         auto_clean=auto_clean,
     )
 
@@ -89,7 +89,7 @@ def import_translations(
     validation_errors, source_name, output_directory = import_validation(
         source_directory,
         source_name,
-        "import_translations",
+        str(import_translations.__name__),
         auto_clean=auto_clean,
     )
 
