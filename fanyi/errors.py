@@ -6,8 +6,8 @@ class ValidationError(Exception):
         self.errors = errors if errors is not None else []
 
     def __str__(self):
-        error_string = "\n".join([f"- {error}" for error in self.errors])
-        return f"{super().__str__()}\n" f"Errors:\n" f"{error_string}"
+        error_string = '\n'.join([f'- {error}' for error in self.errors])
+        return f'{super().__str__()}\n' f'Errors:\n' f'{error_string}'
 
 
 class InvalidCharacterError(Exception):

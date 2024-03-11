@@ -5,5 +5,5 @@ from test_imports import TestImportRaws, TestImportTranslations
 from test_utils import TestUtils
 
 # Run each test
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()

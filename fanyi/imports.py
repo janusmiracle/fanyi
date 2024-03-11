@@ -1,10 +1,10 @@
 import os
 import shutil
-
 from pathlib import Path
 from typing import Optional
-from fanyi.validation import import_validation
+
 from fanyi.errors import ValidationError
+from fanyi.validation import import_validation
 
 
 def import_data(
@@ -37,25 +37,25 @@ def import_data(
 
     # Output errors
     if validation_errors:
-        raise ValidationError("Validation failed.", errors=validation_errors)
+        raise ValidationError('Validation failed.', errors=validation_errors)
 
     # Create source-specific directory within 'data'
     if output_directory is not None:
         os.makedirs(output_directory, exist_ok=True)
 
         # Copy files to 'raws' and 'translations' directories within the source-specific directory
-        for directory_type in ["raws", "translations"]:
+        for directory_type in ['raws', 'translations']:
             directory_path = source_directory / directory_type
             output_directory_type = output_directory / directory_type
             os.makedirs(output_directory_type, exist_ok=True)
 
             for text_file in os.listdir(directory_path):
-                if text_file.endswith(".txt"):
+                if text_file.endswith('.txt'):
                     shutil.copy(directory_path / text_file, output_directory_type)
 
     return output_directory
 
 
-if __name__ == "__main__":
-    output = import_data(Path(os.getcwd() + "/tests/custom_dataset/korean/"), "ARTOC")
+if __name__ == '__main__':
+    output = import_data(Path(os.getcwd() + '/tests/custom_dataset/korean/'), 'ARTOC')
     print(output)

@@ -1,8 +1,8 @@
 import re
-
-from natsort import natsorted
 from pathlib import Path
 from typing import List
+
+from natsort import natsorted
 
 
 def bleu_score():
@@ -23,7 +23,7 @@ def clean_invalid(name: str) -> str:
     str
         The cleaned string with only valid characters.
     """
-    return re.sub(r"[^\w\s\-\(\)\[\]]", "", name)
+    return re.sub(r'[^\w\s\-\(\)\[\]]', '', name)
 
 
 def sort_files(path: Path) -> List[Path]:
