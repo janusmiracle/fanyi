@@ -1,5 +1,5 @@
 from pathlib import Path
 import os
 
-RAWS_PATH = Path(os.getcwd() + "/fanyi/raws")
-TRANSLATIONS_PATH = Path(os.getcwd() + "/fanyi/translations")
+DATA_PATH = Path(os.getcwd() + "/fanyi/data")
+FANYI_PATH = Path(os.getcwd() + "/fanyi/")

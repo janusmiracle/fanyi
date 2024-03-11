@@ -2,7 +2,7 @@ import os
 import re
 
 from fanyi.errors import EmptyDirectoryError, InvalidCharacterError
-from fanyi.paths import RAWS_PATH, TRANSLATIONS_PATH
+from fanyi.paths import DATA_PATH
 from pathlib import Path
 from typing import Tuple, List, Optional
 from fanyi.utils import clean_invalid
@@ -11,7 +11,6 @@ from fanyi.utils import clean_invalid
 def import_validation(
     source_directory: Path,
     source_name: str,
-    calling_function: str,
     auto_clean: Optional[bool] = False,
 ) -> Tuple[List[str], str, Optional[Path]]:
     """
@@ -23,8 +22,7 @@ def import_validation(
         Path to the directory containing text files to be imported.
     source_name : str
         Name for the output directory within the 'raws' or 'translations' directory.
-    calling_function : str
-        Name of the calling function ('import_raws' or 'import_translations').
+
     auto_clean : Optional[bool]
         Whether to automatically clean source_name if it contains illegal characters. (Defaults to False)
 
@@ -43,23 +41,19 @@ def import_validation(
         else:
             validation_errors.append(f"InvalidCharacterError: {e}")
 
-    output_directory = (
-        RAWS_PATH / source_name
-        if calling_function == "import_raws"
-        else TRANSLATIONS_PATH / source_name
-    )
-
     try:
         validate_path(source_directory)
-        validate_output_directory(output_directory)
     except FileNotFoundError as e:
         validation_errors.append(f"FileNotFoundError: {e}")
-    except EmptyDirectoryError as e:
-        validation_errors.append(f"EmptyDirectoryError: {e}")
+
+    source_directory = DATA_PATH / source_name
+
+    try:
+        validate_output_directory(source_directory)
     except FileExistsError as e:
         validation_errors.append(f"FileExistsError: {e}")
 
-    return validation_errors, source_name, output_directory
+    return validation_errors, source_name, source_directory
 
 
 def validate_path(source_directory: Path) -> None:

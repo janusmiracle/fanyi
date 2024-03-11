@@ -3,14 +3,14 @@ import os
 
 from pathlib import Path
 from typing import Generator, Dict, Optional
+from fanyi.imports import import_data
 from fanyi.utils import sort_files
 
 # nltk.download('punkt')
 
 
 def load_data(
-    raw_directory: Optional[Path],
-    translated_directory: Optional[Path],
+    source_directory: Path,
     limit: Optional[int],
 ) -> Generator[Dict[str, str], None, None]:
     """
@@ -36,17 +36,12 @@ def load_data(
     FileNotFoundError
         If the specified directories do not exist.
     """
-    if (
-        raw_directory is None
-        or not raw_directory.exists()
-        or translated_directory is None
-        or not translated_directory.exists()
-    ):
+    if source_directory is not None and not source_directory.exists():
         raise FileNotFoundError("Directories do not exist.")
 
     # Sort directories to ensure consistent ordering after importing
-    raw_files = sort_files(raw_directory)
-    translated_files = sort_files(translated_directory)
+    raw_files = sort_files(source_directory / "raws")
+    translated_files = sort_files(source_directory / "translations")
 
     if limit:
         raw_files = itertools.islice(raw_files, limit)
@@ -75,8 +70,7 @@ def load_data(
 
 if __name__ == "__main__":
     for data in load_data(
-        Path(os.getcwd() + "/tests/custom_dataset/korean/raws/"),
-        Path(os.getcwd() + "/tests/custom_dataset/korean/translations/"),
+        import_data(Path(os.getcwd() + "/tests/custom_dataset/korean/"), "korean"),
         limit=10,
     ):
         print(data, "\n\n")

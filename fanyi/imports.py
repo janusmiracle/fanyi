@@ -1,45 +1,37 @@
-import glob
-import logging
 import os
 import shutil
 
 from pathlib import Path
 from typing import Optional
-from .validation import import_validation
-from .errors import ValidationError
-
-# File handler for the program.
-
-logging.getLogger().setLevel(logging.INFO)
+from fanyi.validation import import_validation
+from fanyi.errors import ValidationError
 
 
-# Setup verbosity option that controls logger.setLevel
-def import_raws(
-    source_directory: Path,
-    source_name: str,
-    auto_clean: Optional[bool] = False,
+def import_data(
+    source_directory: Path, source_name: str, auto_clean: Optional[bool] = False
 ) -> Optional[Path]:
     """
-    Imports raw text files from a source directory into the 'raws' directory.
+    Imports raw text files from a source directory into the 'raws' directory and
+    corresponding translated text files into the 'translations' directory within
+    a source-specific directory in the 'data' folder.
 
     Parameters
     ----------
     source_directory : Path
         Path to the directory containing text files to be imported.
     source_name : str
-        Name for the output directory within the 'raws' directory.
+        Name for the output directory within the 'data' directory.
     auto_clean : Optional[bool]
         Whether to automatically clean source_name if it contains illegal characters. (Defaults to False)
 
     Returns
     -------
     output_directory : Optional[Path]
-        Path leading to the newly imported raw files. (None if validation fails)
+        Path leading to the newly imported raw and translated files. (None if validation fails)
     """
     validation_errors, source_name, output_directory = import_validation(
         source_directory,
         source_name,
-        str(import_raws.__name__),
         auto_clean=auto_clean,
     )
 
@@ -47,66 +39,23 @@ def import_raws(
     if validation_errors:
         raise ValidationError("Validation failed.", errors=validation_errors)
 
-    logging.info("\nImport validation successful.")
-
-    # Create subdirectory within 'raws'
+    # Create source-specific directory within 'data'
     if output_directory is not None:
         os.makedirs(output_directory, exist_ok=True)
 
-        # Populate output_directory with .txt files from source_directory
-        for text_file in glob.glob(os.path.join(source_directory, "*.txt")):
-            shutil.copy(text_file, output_directory)
+        # Copy files to 'raws' and 'translations' directories within the source-specific directory
+        for directory_type in ["raws", "translations"]:
+            directory_path = source_directory / directory_type
+            output_directory_type = output_directory / directory_type
+            os.makedirs(output_directory_type, exist_ok=True)
 
-    logging.info(
-        f"Success. '{source_name}' files from {source_directory} have been imported to '{output_directory}'."
-    )
+            for text_file in os.listdir(directory_path):
+                if text_file.endswith(".txt"):
+                    shutil.copy(directory_path / text_file, output_directory_type)
 
     return output_directory
 
 
-def import_translations(
-    source_directory: Path,
-    source_name: str,
-    auto_clean: Optional[bool] = False,
-) -> Optional[Path]:
-    """
-    Imports corresponding translated text files from a source directory into the 'translations' directory.
-
-    Parameters
-    ----------
-    source_directory : Path
-        Path to the directory containing text files to be imported.
-    source_name : str
-        Name for the output directory within the 'translations' directory.
-    auto_clean : Optional[bool]
-        Whether to automatically clean source_name if it contains illegal characters. (Defaults to False)
-
-    Returns
-    -------
-    output_directory : Optional[Path]
-        Path leading to the newly imported raw files. (None if validation fails)
-    """
-    validation_errors, source_name, output_directory = import_validation(
-        source_directory,
-        source_name,
-        str(import_translations.__name__),
-        auto_clean=auto_clean,
-    )
-
-    # Output errors
-    if validation_errors:
-        raise ValidationError("Validation failed.", errors=validation_errors)
-
-    # Create subdirectory within 'translations'
-    if output_directory is not None:
-        os.makedirs(output_directory, exist_ok=True)
-
-        # Populate output_directory with .txt files from source_directory
-        for text_file in glob.glob(os.path.join(source_directory, "*.txt")):
-            shutil.copy(text_file, output_directory)
-
-    logging.info(
-        f"Success. '{source_name}' files from {source_directory} have been imported to '{output_directory}'."
-    )
-
-    return output_directory
+if __name__ == "__main__":
+    output = import_data(Path(os.getcwd() + "/tests/custom_dataset/korean/"), "ARTOC")
+    print(output)
