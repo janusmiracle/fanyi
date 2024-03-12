@@ -38,14 +38,14 @@ def load_data(
         If source_directory does not exist.
     """
     if source_directory is None:
-        raise ValueError("source_directory cannot be None")
+        raise ValueError('source_directory cannot be None')
 
     if not source_directory.exists():
-        raise FileNotFoundError(f"Directory {source_directory} does not exist.")
+        raise FileNotFoundError(f'Directory {source_directory} does not exist.')
 
     # Sort directories to ensure consistent ordering after importing
-    raw_files = sort_files(source_directory.joinpath("raws"))
-    translated_files = sort_files(source_directory.joinpath("translations"))
+    raw_files = sort_files(source_directory.joinpath('raws'))
+    translated_files = sort_files(source_directory.joinpath('translations'))
 
     if limit:
         raw_files = itertools.islice(raw_files, limit)
@@ -54,27 +54,27 @@ def load_data(
     for raw_path, translated_path in zip(raw_files, translated_files):
         if (
             raw_path.is_file()
-            and raw_path.suffix == ".txt"
+            and raw_path.suffix == '.txt'
             and translated_path.is_file()
-            and translated_path.suffix == ".txt"
+            and translated_path.suffix == '.txt'
         ):
-            with open(raw_path, "r", encoding="utf-8") as raw_file, open(
-                translated_path, "r", encoding="utf-8"
+            with open(raw_path, 'r', encoding='utf-8') as raw_file, open(
+                translated_path, 'r', encoding='utf-8'
             ) as translated_file:
                 raw_text_data = raw_file.read()
                 translated_text_data = translated_file.read()
 
             yield {
-                "raw_filename": raw_path.name,
-                "raw_text": raw_text_data,
-                "translated_filename": translated_path.name,
-                "translated_text": translated_text_data,
+                'raw_filename': raw_path.name,
+                'raw_text': raw_text_data,
+                'translated_filename': translated_path.name,
+                'translated_text': translated_text_data,
             }
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     for data in load_data(
-        import_data(Path(os.getcwd() + "/tests/custom_dataset/korean/"), "korean"),
+        import_data(Path(os.getcwd() + '/tests/custom_dataset/korean/'), 'korean'),
         limit=10,
     ):
-        print(data, "\n\n")
+        print(data, '\n\n')
