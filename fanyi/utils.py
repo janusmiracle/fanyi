@@ -1,12 +1,42 @@
+import nltk
 import re
+
+from natsort import natsorted
+from nltk.translate.bleu_score import corpus_bleu
+
+# Try out other tokenizers
+from nltk.tokenize import word_tokenize
 from pathlib import Path
 from typing import List
 
-from natsort import natsorted
 
+# Allow for multiple references?
+def bleu_score(hypothesis_file: Path, reference_file: Path) -> float:
+    """
+    Calculates the BLEU score between the machine-translated text in the hypothesis file
+    and the human-translated text in the reference file.
 
-def bleu_score():
-    return
+    Parameters
+    ----------
+    hypothesis_file : Path
+        Path to the file containing the machine-translated text.
+    reference_file : Path
+        Path to the file containing the human-translated text.
+
+    Returns
+    -------
+    bleu_score : float
+        The BLEU score between 0 and 1, indicating the similarity between the two texts.
+    """
+    hypothesis_text = hypothesis_file.read_text()
+    reference_text = reference_file.read_text()
+
+    hypothesis = word_tokenize(hypothesis_text.lower())
+    reference = word_tokenize(reference_text.lower())
+
+    bleu_score = corpus_bleu([reference], [hypothesis])
+
+    return bleu_score  # type: ignore
 
 
 def clean_invalid(name: str) -> str:
