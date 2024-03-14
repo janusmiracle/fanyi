@@ -3,8 +3,6 @@ import re
 
 from natsort import natsorted
 from nltk.translate.bleu_score import corpus_bleu
-
-# Try out other tokenizers
 from nltk.tokenize import word_tokenize
 from pathlib import Path
 from typing import List
@@ -67,4 +65,5 @@ def sort_files(path: Path) -> List[Path]:
     """
     files = path.iterdir()
     sorted_files = natsorted(files)
+
     return list(sorted_files)

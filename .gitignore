@@ -1,3 +1,6 @@
 fanyi/__pycache__/
 tests/__pycache__/
-
+fanyi/model/
+fanyi/results/
+fanyi/tr.py
+fanyi/train.py

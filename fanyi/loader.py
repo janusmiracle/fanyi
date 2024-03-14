@@ -1,5 +1,6 @@
 import itertools
 import os
+
 from pathlib import Path
 from typing import Dict, Generator, Optional
 
@@ -63,16 +64,14 @@ def load_data(
                 translated_text_data = translated_file.read()
 
             yield {
-                'raw_filename': raw_path.name,
                 'raw_text': raw_text_data,
-                'translated_filename': translated_path.name,
                 'translated_text': translated_text_data,
             }
 
 
 if __name__ == '__main__':
     for data in load_data(
-        import_data(Path(os.getcwd() + '/tests/custom_dataset/korean/'), 'korean'),
+        import_data(Path(os.getcwd() + '/tests/custom_dataset/chinese/'), 'chinese'),
         limit=10,
     ):
-        print(data, '\n\n')
+        pass

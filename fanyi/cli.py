@@ -1,7 +1,6 @@
 import argparse
-from pathlib import Path
 
-# Outlining the args, has not been tested
+from pathlib import Path
 
 
 def main():
