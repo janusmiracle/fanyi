@@ -1,36 +1,46 @@
 import argparse
 
 from pathlib import Path
+from typing import Optional
+
+from fanyi.imports import import_data
+from fanyi.loader import load_data
+
+
+def import_and_load(
+    source_directory: Path, source_name: str, max_files: Optional[int]
+) -> None:
+    output_directory = import_data(source_directory, source_name)
+
+    if output_directory is None:
+        # Unnecessary as this would be raised
+        print('Import failed. Exiting.')
+        return
+
+    generator = load_data(output_directory, max_files)
+
+    for index, data in enumerate(generator, start=1):
+        print(f'\nFile {index}:')
+        print(f"    - Raw Filename:         {data['raw_filename']}")
+        print(f"    - Translated Filename:  {data['translated_filename']}")
 
 
 def main():
-    parser = argparse.ArgumentParser(description='model.')
-    parser.add_argument('n', '--name', type=str, help='Name of the files.')
-    parser.add_argument(
-        '-r',
-        '--raw',
-        type=Path,
-        help='Path to the directory containing raw text files.',
+    # Obviously, edit this later.
+    parser = argparse.ArgumentParser(
+        description='Import and load data from text files.'
     )
     parser.add_argument(
-        '-t',
-        '--translated',
-        type=Path,
-        help='Path to the directory containing translated text files.',
+        '--source', '-s', type=Path, help='Path to the source directory.'
     )
-    parser.add_argument(
-        '-l', '--language', type=str, help='Language code (e.g., CN, JP, KR).'
-    )
-    parser.add_argument('--limit', type=int, help='Maximum number of files to load.')
+    parser.add_argument('--name', '-n', type=str, help='Name for the output directory.')
+    parser.add_argument('--max', type=int, help='Maximum number of files to load.')
 
+    # parser.add_argument("-l", "--language", type=str, help="Language code (e.g., CN, JP, KR).")
     # Add an optional output directory for both the translated files + finetuned model
     args = parser.parse_args()
 
-    name = args.name
-    raw_directory = args.raw
-    translated_directory = args.translated
-    language = args.language
-    limit = args.limit
+    import_and_load(args.source, args.name, args.max)
 
 
 if __name__ == '__main__':

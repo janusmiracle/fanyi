@@ -46,19 +46,16 @@ def import_data(
 
     # Create source-specific directory within 'data'
     if output_directory is not None:
-        os.makedirs(output_directory, exist_ok=True)
+        output_directory.mkdir(parents=True, exist_ok=True)
 
         # Copy files to 'raws' and 'translations' directories within the source directory
         for directory_type in ['raws', 'translations']:
             directory_path = source_directory.joinpath(directory_type)
             output_directory_type = output_directory.joinpath(directory_type)
-            os.makedirs(output_directory_type, exist_ok=True)
+            output_directory_type.mkdir(exist_ok=True)
 
-            for text_file in os.listdir(directory_path):
-                if text_file.endswith('.txt'):
-                    shutil.copy(
-                        directory_path.joinpath(text_file), output_directory_type
-                    )
+            for text_file in directory_path.glob('*.txt'):
+                shutil.copy(text_file, output_directory_type)
 
     return output_directory
 
