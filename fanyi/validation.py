@@ -73,7 +73,7 @@ def validate_path(source_directory: Path) -> None:
             f"Source directory '{source_directory}' does not exist."
         )
 
-    if not os.listdir(source_directory):
+    if not any(source_directory.iterdir()):
         raise EmptyDirectoryError(source_directory)
 
 
