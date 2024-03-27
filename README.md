@@ -1,6 +1,10 @@
+<div style="text-align: center;">
+
 # Fanyi
 
-The goal of Fanyi is to provide better novel translations for avid readers. The process involves training translation models with raw novel chapters in the original language along with professionally human-translated chapters. The trained models are then used to provide higher-quality translations for untranslated chapters.
+</div>
+
+Fanyi aims to enhance novel translations for readers. It trains models using raw and human-translated chapters, resulting in improved translations for remaining chapters.
 
 ## Getting Started
 
