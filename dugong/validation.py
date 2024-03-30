@@ -1,4 +1,3 @@
-import os
 import re
 
 from pathlib import Path
@@ -12,7 +11,6 @@ from dugong.utils import clean_invalid
 def import_validation(
     source_directory: Path,
     source_name: str,
-    auto_clean: Optional[bool] = False,
 ) -> Tuple[List[str], str, Optional[Path]]:
     """
     Validates the input for importing raw text files or translations.
@@ -24,9 +22,6 @@ def import_validation(
     source_name : str
         Name for the output directory within the 'raws' or 'translations' directory.
 
-    auto_clean : Optional[bool]
-        Whether to automatically clean source_name if it contains illegal characters. (Defaults to False)
-
     Returns
     -------
     Tuple[List[str], str, Optional[Path]]
@@ -37,22 +32,20 @@ def import_validation(
     try:
         validate_name(source_name)
     except InvalidCharacterError as e:
-        if auto_clean:
-            source_name = clean_invalid(source_name)
-        else:
-            validation_errors.append(f"InvalidCharacterError: {e}")
+        source_name = clean_invalid(source_name)
+        validation_errors.append(f'InvalidCharacterError: {e}')
 
     try:
         validate_path(source_directory)
     except FileNotFoundError as e:
-        validation_errors.append(f"FileNotFoundError: {e}")
+        validation_errors.append(f'FileNotFoundError: {e}')
 
     source_directory = DATA_PATH.joinpath(source_name)
 
     try:
         validate_output_directory(source_directory)
     except FileExistsError as e:
-        validation_errors.append(f"FileExistsError: {e}")
+        validation_errors.append(f'FileExistsError: {e}')
 
     return validation_errors, source_name, source_directory
 
@@ -99,5 +92,5 @@ def validate_name(source_name: str) -> None:
     InvalidCharacterError
         If the inputted name contains an invalid character.
     """
-    if re.search(r"[^a-zA-Z0-9_\-\(\)]", source_name):
+    if re.search(r'[^a-zA-Z0-9_\-\(\)]', source_name):
         raise InvalidCharacterError(source_name)
