@@ -1,8 +1,8 @@
 [tool.poetry]
-name = "fanyi"
+name = "dugong"
 version = "0.1.0"
-description = "Improve NLP-based machine-generated novel translations through the application of transfer learning."
-authors = ["janusmiracle <janusmiracle@outlook.com>"]
+description = "Improve machine-generated novel translations through the application of transfer learning."
+authors = ["nugong <nugong@outlook.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
@@ -26,9 +26,9 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 # Test using cli
-import = "fanyi.cli:main"
-train = "fanyi.train:main"
-translate = "fanyi.translate:main"
+import = "dugong.cli:main"
+train = "dugong.train:main"
+translate = "dugong.translate:main"
 
 # Ruff stuff
 [tool.ruff.lint.per-file-ignores]

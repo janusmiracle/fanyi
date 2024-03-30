@@ -1,23 +1,21 @@
-<div style="text-align: center;">
-
-# Fanyi
+# Dugong
 
 </div>
 
-Fanyi aims to enhance novel translations for readers. It trains models using raw and human-translated chapters, resulting in improved translations for remaining chapters.
+Dugong aims to enhance novel translations for readers. It trains models using raw and human-translated chapters, resulting in improved translations for remaining chapters.
 
 ## Getting Started
 
 Clone the repository:
 
 ```
-$ git clone git@github.com:janusmiracle/fanyi.git
+$ git clone git@github.com:nugong/dugong.git
 ```
 
 Install the required dependencies using Poetry:
 
 ```
-$ cd fanyi
+$ cd dugong
 $ poetry install
 ```
 
@@ -39,7 +37,7 @@ source/
     └── ...
 ```
 
-Fanyi will import and load the data from each file before training the model. It will then output a fine-tuned model.
+Dugong will import and load the data from each file before training the model. It will then output a fine-tuned model.
 
 Run the training script:
 

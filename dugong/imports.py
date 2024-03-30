@@ -4,8 +4,8 @@ import shutil
 from pathlib import Path
 from typing import Optional
 
-from fanyi.errors import ValidationError
-from fanyi.validation import import_validation
+from dugong.errors import ValidationError
+from dugong.validation import import_validation
 
 
 def import_data(
@@ -41,7 +41,7 @@ def import_data(
     # Output errors
     if validation_errors:
         raise ValidationError(
-            'Import validation has failed.\n', errors=validation_errors
+            "Import validation has failed.\n", errors=validation_errors
         )
 
     # Create source-specific directory within 'data'
@@ -49,17 +49,17 @@ def import_data(
         output_directory.mkdir(parents=True, exist_ok=True)
 
         # Copy files to 'raws' and 'translations' directories within the source directory
-        for directory_type in ['raws', 'translations']:
+        for directory_type in ["raws", "translations"]:
             directory_path = source_directory.joinpath(directory_type)
             output_directory_type = output_directory.joinpath(directory_type)
             output_directory_type.mkdir(exist_ok=True)
 
-            for text_file in directory_path.glob('*.txt'):
+            for text_file in directory_path.glob("*.txt"):
                 shutil.copy(text_file, output_directory_type)
 
     return output_directory
 
 
-if __name__ == '__main__':
-    output = import_data(Path(os.getcwd() + '/tests/custom_dataset/korean/'), 'ARTOC')
+if __name__ == "__main__":
+    output = import_data(Path(os.getcwd() + "/tests/custom_dataset/korean/"), "ARTOC")
     print(output)

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DATA_PATH="./fanyi/data/"
+DATA_PATH="./dugong/data/"
 
 # Clean the raws and translations directory
 clean_directory() {

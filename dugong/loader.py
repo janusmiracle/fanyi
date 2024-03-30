@@ -4,8 +4,8 @@ import os
 from pathlib import Path
 from typing import Dict, Generator, Optional
 
-from fanyi.imports import import_data
-from fanyi.utils import sort_files
+from dugong.imports import import_data
+from dugong.utils import sort_files
 
 
 def load_data(
@@ -37,14 +37,14 @@ def load_data(
         If source_directory does not exist.
     """
     if source_directory is None:
-        raise ValueError('Import has failed. source_directory cannot be None.')
+        raise ValueError("Import has failed. source_directory cannot be None.")
 
     if not source_directory.exists():
-        raise FileNotFoundError(f'Directory {source_directory} does not exist.')
+        raise FileNotFoundError(f"Directory {source_directory} does not exist.")
 
     # Sort directories to ensure consistent ordering after importing
-    raw_files = sort_files(source_directory.joinpath('raws'))
-    translated_files = sort_files(source_directory.joinpath('translations'))
+    raw_files = sort_files(source_directory.joinpath("raws"))
+    translated_files = sort_files(source_directory.joinpath("translations"))
 
     if max_files:
         raw_files = itertools.islice(raw_files, max_files)
@@ -57,16 +57,16 @@ def load_data(
 
         # Load filenames for now, may change later (edit docstring whenever this is decided on)
         yield {
-            'raw_filename': raw_path.name,
-            'raw_text': raw_text,
-            'translated_filename': translated_path.name,
-            'translated_text': translated_text,
+            "raw_filename": raw_path.name,
+            "raw_text": raw_text,
+            "translated_filename": translated_path.name,
+            "translated_text": translated_text,
         }
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     for data in load_data(
-        import_data(Path(os.getcwd() + '/tests/custom_dataset/chinese/'), 'chinese'),
+        import_data(Path(os.getcwd() + "/tests/custom_dataset/chinese/"), "chinese"),
         limit=10,
     ):
         pass

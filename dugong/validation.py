@@ -4,9 +4,9 @@ import re
 from pathlib import Path
 from typing import List, Optional, Tuple
 
-from fanyi.errors import EmptyDirectoryError, InvalidCharacterError
-from fanyi.paths import DATA_PATH
-from fanyi.utils import clean_invalid
+from dugong.errors import EmptyDirectoryError, InvalidCharacterError
+from dugong.paths import DATA_PATH
+from dugong.utils import clean_invalid
 
 
 def import_validation(
@@ -40,19 +40,19 @@ def import_validation(
         if auto_clean:
             source_name = clean_invalid(source_name)
         else:
-            validation_errors.append(f'InvalidCharacterError: {e}')
+            validation_errors.append(f"InvalidCharacterError: {e}")
 
     try:
         validate_path(source_directory)
     except FileNotFoundError as e:
-        validation_errors.append(f'FileNotFoundError: {e}')
+        validation_errors.append(f"FileNotFoundError: {e}")
 
     source_directory = DATA_PATH.joinpath(source_name)
 
     try:
         validate_output_directory(source_directory)
     except FileExistsError as e:
-        validation_errors.append(f'FileExistsError: {e}')
+        validation_errors.append(f"FileExistsError: {e}")
 
     return validation_errors, source_name, source_directory
 
@@ -99,5 +99,5 @@ def validate_name(source_name: str) -> None:
     InvalidCharacterError
         If the inputted name contains an invalid character.
     """
-    if re.search(r'[^a-zA-Z0-9_\-\(\)]', source_name):
+    if re.search(r"[^a-zA-Z0-9_\-\(\)]", source_name):
         raise InvalidCharacterError(source_name)
