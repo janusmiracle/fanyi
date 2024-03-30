@@ -31,9 +31,12 @@ def import_validation(
 
     try:
         validate_name(source_name)
-    except InvalidCharacterError as e:
+    except InvalidCharacterError:
+        print(f'{source_name} contains illegal characters\n')
         source_name = clean_invalid(source_name)
-        validation_errors.append(f'InvalidCharacterError: {e}')
+        print(f'Cleaned name: {source_name}\n')
+
+        # validation_errors.append(f'InvalidCharacterError: {e}')
 
     try:
         validate_path(source_directory)
