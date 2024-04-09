@@ -1,6 +1,9 @@
 # Dugong
 
-</div>
+
+# NOTE
+
+The project is currently incomplete, the training and translation commands are not pushed.
 
 Dugong aims to enhance novel translations for readers. It trains models using raw and human-translated chapters, resulting in improved translations for remaining chapters.
 
@@ -70,8 +73,4 @@ Example:
 $ poetry run translate --input /path/input --output /path/output --model /path/to/model
 ```
 
-
-# NOTE
-
-The project is currently incomplete, the training and translation still needs to be done.
 
