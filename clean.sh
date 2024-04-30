@@ -1,6 +1,7 @@
 #!/bin/bash
 
 DATA_PATH="./dugong/data/"
+MODELS_PATH="./dugong/models/"
 
 # Clean the raws and translations directory
 clean_directory() {
@@ -11,3 +12,7 @@ clean_directory() {
 clean_directory "$DATA_PATH"
 
 echo "Data folder has been cleaned."
+
+clean_directory "$MODELS_PATH"
+
+echo "Models folder has been cleaned."

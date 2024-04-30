@@ -1,3 +1,7 @@
 dugong/__pycache__/
 tests/__pycache__/
-
+tests/custom_dataset/
+dugong/old/
+dugong/models/
+dugong/model/
+dugong/base.py
