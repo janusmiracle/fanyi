@@ -2,10 +2,7 @@ import numpy as np
 
 
 class Evaluate:
-    """
-    Evaluate model predictions using a specified metric.
-
-    """
+    """Evaluate model predictions using a specified metric."""
 
     def __init__(self, tokenizer, metric):
         self.tokenizer = tokenizer
