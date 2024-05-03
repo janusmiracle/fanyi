@@ -12,7 +12,7 @@ VALID_EXTENSIONS = [".txt", ".json"]
 
 
 class Handler:
-    """File handler."""
+    """Data handler for managing directories and importing files for a specified dataset."""
 
     def __init__(self, name: str, train_file: Path, test_file: Path):
         self.name = name

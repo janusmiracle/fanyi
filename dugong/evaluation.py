@@ -3,22 +3,8 @@ import numpy as np
 
 class Evaluate:
     """
-    A class for evaluating model predictions using a specified metric.
+    Evaluate model predictions using a specified metric.
 
-    Parameters
-    ----------
-    tokenizer : transformers.PreTrainedTokenizer
-        The tokenizer used to decode model predictions.
-    metric : sacrebleu.metrics.BLEU
-        The metric used to compute the evaluation score.
-
-    Methods
-    -------
-    compute_metrics(eval_preds)
-        Compute the evaluation metric for the given predictions.
-
-    _postprocess_text(preds, labels)
-        Postprocesses the predicted and label texts.
     """
 
     def __init__(self, tokenizer, metric):

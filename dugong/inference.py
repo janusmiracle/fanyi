@@ -8,7 +8,7 @@ from typing import Union
 
 
 class Inference:
-    """Use finetuned model for inference."""
+    """Use finetuned models for inference."""
 
     def __init__(self, tokenizer: Union[MarianTokenizer, T5Tokenizer],
                  model: Union[MarianMTModel, T5ForConditionalGeneration]):

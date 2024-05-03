@@ -15,25 +15,9 @@ class Preprocessor:
     """
     Loads and preprocesses datasets for training.
 
-    The preprocessor loads datasets from JSON and
-    initializes a Dataset in Hugging Face format.
+    The preprocessor loads datasets from JSON and initializes a Dataset in Hugging Face format.
 
     A MarianMT or T5Tokenizer is also initialized.
-
-    Args:
-        source_lang (str): The source language code.
-        target_lang (str): The target language code.
-        model (str, optional): The model to use ("t5" for T5 or MarianMT otherwise). Defaults to None.
-        size (str, optional): The size of the model ("small", "base", "large"). Defaults to None.
-
-    Attributes:
-        tokenizer (Union[T5Tokenizer, MarianTokenizer]): The initialized tokenizer.
-        checkpoint (str): The model checkpoint used.
-
-    Methods:
-        get_tokenizer: Returns the initialized tokenizer.
-        get_checkpoint: Returns the model checkpoint.
-        preprocess: Preprocesses the training and testing datasets.
     """
 
     def __init__(
