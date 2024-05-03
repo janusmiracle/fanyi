@@ -3,12 +3,11 @@
 Dugong aims to enhance novel translations for readers. 
 
 # Todo
-
-Update preprocess & training for imported files.
-
 Update testing.
 
 Add argparsing that includes training options.
+
+Create separate method within Training classes to handle training args.
 
 Add alternative training using TensorFlow.
 
