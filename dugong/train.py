@@ -3,7 +3,6 @@ import torch
 import warnings
 
 from datasets import Dataset
-from nltk.translate.bleu_score import corpus_bleu, SmoothingFunction
 from pathlib import Path
 from rich.progress import Progress
 from rich.console import Console
@@ -30,17 +29,6 @@ logging.set_verbosity_error()
 METRIC = evaluate.load("sacrebleu")
 
 
-# class BatchEncodingDataset(torch.utils.data.Dataset):
-# def __init__(self, encodings):
-# self.encodings = encodings
-
-# def __getitem__(self, idx):
-# return {key: torch.tensor(val[idx]) for key, val in self.encodings.items()}
-
-# def __len__(self):
-# return len(self.encodings.input_ids)
-
-
 class BatchEncodingDataset(torch.utils.data.Dataset):
     def __init__(self, encodings):
         self.encodings = encodings
@@ -58,27 +46,8 @@ class BatchEncodingDataset(torch.utils.data.Dataset):
     def __len__(self):
         return len(self.encodings.input_ids)
 
-    # class BatchEncodingDataset(torch.utils.data.Dataset):
-    # def __init__(self, inputs, targets):
-    # self.inputs = inputs
-    # self.targets = targets
-    #
-    # def __getitem__(self, idx):
-    # input_ids = torch.tensor(self.inputs["input_ids"][idx])
-    # attention_mask = torch.tensor(self.inputs["attention_mask"][idx])
-    # labels = torch.tensor(
-    # self.targets["input_ids"][idx]
-    # )  # Assuming targets are also tokenized
-    # return {
-    # "input_ids": input_ids,
-    # "attention_mask": attention_mask,
-    # "labels": labels,
-    # }
-    #
-    # def __len__(self):
-    # return len(self.inputs["input_ids"])
-
-
+def MarianTrainer:
+    """Train MarianMT Models."""
 def setup(
     train_path: Path,
     test_path: Path,
@@ -193,32 +162,6 @@ def train_torch(
             console.print(metrics_panel)
 
     console.print("[green]Training complete![/green]")
-
-
-def translate_and_score(train_path, test_path, source_lang, target_lang, size="small"):
-    train_dataset, test_dataset, tokenizer, _, evaluate, _, model = setup(
-        train_path, test_path, source_lang, target_lang, size
-    )
-
-    translated_texts = []
-    for i in range(len(test_dataset)):
-        input_text = test_dataset[i]["input_ids"].unsqueeze(0)
-        translated_text = model.generate(input_text)[0]
-        translated_text = tokenizer.decode(translated_text, skip_special_tokens=True)
-        translated_texts.append(translated_text)
-
-    en_texts = [
-        tokenizer.decode(test_dataset[i]["labels"], skip_special_tokens=True)
-        for i in range(len(test_dataset))
-    ]
-
-    bleu_score = corpus_bleu(
-        [[en_text.split()] for en_text in en_texts],
-        translated_texts,
-        smoothing_function=SmoothingFunction().method1,
-    )
-
-    return bleu_score
 
 
 if __name__ == "__main__":

@@ -1,3 +1,10 @@
+import os
+
+from pathlib import Path
+
+DATA_PATH = Path(os.getcwd() + "/dugong/data")
+SRC_PATH = Path(os.getcwd() + "/dugong/")
+
 T5_MODELS = {
     "small": "google-t5/t5-small",
     "base": "google-t5/t5-base",

@@ -7,6 +7,7 @@ from rich.table import Table
 from transformers import MarianTokenizer, T5Tokenizer
 from typing import Optional, Tuple, Union
 
+from dugong.handler import Handler
 from dugong.misc import LANGUAGE_CODES, T5_MODELS
 
 
@@ -205,10 +206,18 @@ class Preprocessor:
 
 
 if __name__ == "__main__":
+
+    handler = Handler(
+        "willthiswork",
+        Path("dugong/examples/corpus_train.json"),
+        Path("dugong/examples/corpus_test.json"),
+    )
+    train_path, test_path = handler.import_files()
+
     preprocessor = Preprocessor(source_lang="zh", target_lang="en")
     tokenizer = preprocessor.get_tokenizer()
     train_tokenized_dataset, test_tokenized_dataset = preprocessor.preprocess(
-        Path("dugong/corpus_train.json"), Path("dugong/corpus_test.json")
+        train_path, test_path
     )
     # print(train_tokenized_dataset)
 
@@ -218,8 +227,6 @@ if __name__ == "__main__":
     decoded_dataset2 = tokenizer.batch_decode(
         test_tokenized_dataset["labels"], skip_special_tokens=True
     )
-
-    print(len(train_tokenized_dataset["input_ids"]))
-    print(len(train_tokenized_dataset["labels"]))
+    print(decoded_dataset1)
     # print("DECODED: \n")
     # print(decoded_dataset.keys())
