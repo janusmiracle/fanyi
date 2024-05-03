@@ -33,9 +33,15 @@ class Handler:
         """Returns name."""
         return self.name
 
+    def source_dir(self) -> Path:
+        return DATA_PATH.joinpath(self.name)
+
+    def output_dir(self) -> Path:
+        return self.source_dir().joinpath("models")
+
     def create_folders(self) -> Path:
         """Creates train, test, models, and translations subdirectories."""
-        source_directory = DATA_PATH.joinpath(self.name)
+        source_directory = self.source_dir()
         source_directory.mkdir(parents=True, exist_ok=True)
 
         train_directory = source_directory.joinpath("train")
@@ -80,3 +86,5 @@ if __name__ == "__main__":
     )
     output_directory, q = handler.import_files()
     print(type(output_directory), q)
+    print(handler.source_dir())
+    print(handler.output_dir())
