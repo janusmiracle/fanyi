@@ -52,53 +52,47 @@ class Inference:
 
         return translator
 
-    def load_data(self):
-        """Lazy load files and their sentences."""
+    def _load_files(self):
+        """Lazy load files up to file limit."""
         files = sort_files(self.source_dir)
 
         # Only load up to file limit
         if self.file_limit:
             files = itertools.islice(files, self.file_limit)
 
-        for idx, path in enumerate(files, start=1):
-            with open(path, "r", encoding="utf-8") as file:
-                sentences = file.read().split("\n")
+        for file in files:
+            yield file
 
-                for sentence in sentences:
-                    yield sentence
+    def _load_sentences(self, loaded_file):
+        """Lazy load files and their sentences."""
+        with open(loaded_file, "r", encoding="utf-8") as file:
+            sentences = file.read().split("\n")
 
-            yield None
+            for sentence in sentences:
+                yield sentence
 
     def translate(self):
         """Translates text from a file. If given a directory, each file is translated."""
         translator = self._translator()
         translations = []
-
-        loader = self.load_data()
         count = 1
-        try:
-            while True:
-                sentence = next(loader)
-                if sentence is None:  # EOF
-                    output_filename = f"translation-{count}.txt"
-                    output_path = self.output_dir.joinpath(output_filename)
-                    with open(output_path, "w", encoding="utf-8") as output_file:
-                        output_file.write("\n".join(translations))
+        for file in self._load_files():
+            for sentence in self._load_sentences(file):
+                translated_sentence = translator(sentence)
+                translated_sentence = translated_sentence[0]["translation_text"]
+                translations.append(translated_sentence + "\n")
 
-                    print(
-                        f"File {count} translation complete. Translation stored as {output_filename} in {self.output_dir}.\n"
-                    )
-                    translations = []
-                    count += 1
-                else:
-                    translated_sentence = translator(sentence)
-                    if translated_sentence:
-                        translated_sentence = translated_sentence[0]["translation_text"]
-                        translations.append(translated_sentence)
-                        translations.append("\n")
+            output_filename = f"translation-{count}.txt"
+            output_path = self.output_dir.joinpath(output_filename)
+            with open(output_path, "w", encoding="utf-8") as output_file:
+                output_file.write("\n".join(translations))
 
-        except StopIteration:
-            pass
+                print(
+                    f"File {count} translation complete. Translation stored as {output_filename} in {self.output_dir}.\n"
+                )
+
+                translations = []
+                count += 1
 
 
 if __name__ == "__main__":
@@ -113,11 +107,11 @@ if __name__ == "__main__":
     output_dir = handler.output_dir()
     checkpoint = "Helsinki-NLP/opus-mt-zh-en"
     tokenizer = MarianTokenizer.from_pretrained(checkpoint)
-    marian_train = MarianTrainer(train_dir, test_dir, "zh", "en", output_dir)
-    model, tokenizer = marian_train.train_torch()
+    # marian_train = MarianTrainer(train_dir, test_dir, "zh", "en", output_dir)
+    # model, tokenizer = marian_train.train_torch()
 
     inference = Inference(
-        model,
+        "dugong/data/yippee/models/checkpoint-1",
         tokenizer,
         Path("tests/custom_dataset/chinese/raws"),
         main_dir,
