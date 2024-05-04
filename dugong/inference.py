@@ -95,6 +95,7 @@ class Inference:
                     if translated_sentence:
                         translated_sentence = translated_sentence[0]["translation_text"]
                         translations.append(translated_sentence)
+                        translations.append("\n")
 
         except StopIteration:
             pass
@@ -122,7 +123,7 @@ if __name__ == "__main__":
         main_dir,
         "zh",
         "en",
-        file_limit=1,
+        file_limit=2,
     )
 
     inference.translate()
