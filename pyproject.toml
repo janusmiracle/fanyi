@@ -2,7 +2,7 @@
 name = "dugong"
 version = "0.1.0"
 description = "Improve machine-generated novel translations through the application of transfer learning."
-authors = ["yaeso <janusmiracle@outlook.com>"]
+authors = ["yaeso"]
 readme = "README.md"
 
 [tool.poetry.dependencies]

@@ -1,10 +1,13 @@
+import itertools
 import shutil
 import os
 
+from nltk.tokenize import sent_tokenize
 from pathlib import Path
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple
 
 from dugong.misc import DATA_PATH
+from dugong.utils import sort_files
 
 # from dugong.validations import Validation
 
@@ -56,6 +59,8 @@ class Handler:
         translations_directory = source_directory.joinpath("translations")
         translations_directory.mkdir(exist_ok=True)
 
+        print(f"{source_directory} created.")
+
         return source_directory
 
     def import_files(self) -> Tuple[Path, Path]:
@@ -69,13 +74,11 @@ class Handler:
         shutil.copy(self.train_file, train_directory)
         shutil.copy(self.test_file, test_directory)
 
+        print(f"\nFiles successfully imported to {source_directory}.\n")
+
         return train_directory.joinpath(self.train_file.name), test_directory.joinpath(
             self.test_file.name
         )
-
-
-class Loader:
-    """Lazy loads files from a directory and their text."""
 
 
 if __name__ == "__main__":

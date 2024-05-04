@@ -1,60 +1,128 @@
-from nltk.translate.bleu_score import corpus_bleu, SmoothingFunction
+import itertools
+
 from pathlib import Path
 from transformers import (
-    MarianTokenizer, MarianMTModel, pipeline,
-    T5Tokenizer, T5ForConditionalGeneration
+    MarianTokenizer,
+    MarianMTModel,
+    pipeline,
+    T5Tokenizer,
+    T5ForConditionalGeneration,
+    TranslationPipeline,
 )
-from typing import Union
+from typing import Optional, Union
+
+from dugong.handler import Handler
+from dugong.train import MarianTrainer
+from dugong.utils import sort_files
 
 
 class Inference:
     """Use finetuned models for inference."""
 
-    def __init__(self, tokenizer: Union[MarianTokenizer, T5Tokenizer],
-                 model: Union[MarianMTModel, T5ForConditionalGeneration]):
+    def __init__(
+        self,
+        model: Union[MarianMTModel, T5ForConditionalGeneration],
+        tokenizer: Union[MarianTokenizer, T5Tokenizer],
+        source_dir: Path,
+        output_dir: Path,
+        source_lang: str,
+        target_lang: str,
+        file_limit: Optional[int],
+        t5: Optional[bool] = False,
+    ):
         self.model = model
         self.tokenizer = tokenizer
+        self.source_dir = source_dir
+        self.output_dir = output_dir
+        self.file_limit = file_limit
+        self.t5 = t5
 
-    def _translator(self):
-        translator = pipeline(task="translation", model=self.model,
-                              tokenizer=self.tokenizer)
+    def _translator(self) -> TranslationPipeline:
+        if not self.t5:
+            translator = pipeline(
+                task="translation", model=self.model, tokenizer=self.tokenizer
+            )
+
+        else:
+            translator = pipeline(
+                f"task=translation_{self.source_lang}_to_{self.target_lang}",
+                model=self.model,
+                tokenizer=self.tokenizer,
+            )
+
         return translator
 
-    def _score(self, references: Path, hypotheses: Optional[Path]):
-        return
+    def load_data(self):
+        """Lazy load files and their sentences."""
+        files = sort_files(self.source_dir)
 
-    def translate(self, references, hypotheses=Optional[]):
-        """Translates reference text and provides a BLEU score if given a hypothesis."""
-        return
+        # Only load up to file limit
+        if self.file_limit:
+            files = itertools.islice(files, self.file_limit)
+
+        for idx, path in enumerate(files, start=1):
+            with open(path, "r", encoding="utf-8") as file:
+                sentences = file.read().split("\n")
+
+                for sentence in sentences:
+                    yield sentence
+
+            yield None
+
+    def translate(self):
+        """Translates text from a file. If given a directory, each file is translated."""
+        translator = self._translator()
+        translations = []
+
+        loader = self.load_data()
+        count = 1
+        try:
+            while True:
+                sentence = next(loader)
+                if sentence is None:  # EOF
+                    output_filename = f"translation-{count}.txt"
+                    output_path = self.output_dir.joinpath(output_filename)
+                    with open(output_path, "w", encoding="utf-8") as output_file:
+                        output_file.write("\n".join(translations))
+
+                    print(
+                        f"File {count} translation complete. Translation stored as {output_filename} in {self.output_dir}.\n"
+                    )
+                    translations = []
+                    count += 1
+                else:
+                    translated_sentence = translator(sentence)
+                    if translated_sentence:
+                        translated_sentence = translated_sentence[0]["translation_text"]
+                        translations.append(translated_sentence)
+
+        except StopIteration:
+            pass
 
 
+if __name__ == "__main__":
+    handler = Handler(
+        "yippee",
+        Path("dugong/examples/corpus_train.json"),
+        Path("dugong/examples/corpus_test.json"),
+    )
+    train_dir, test_dir = handler.import_files()
+    main_dir = handler.source_dir()
+    main_dir = main_dir / "translations"
+    output_dir = handler.output_dir()
+    checkpoint = "Helsinki-NLP/opus-mt-zh-en"
+    tokenizer = MarianTokenizer.from_pretrained(checkpoint)
+    marian_train = MarianTrainer(train_dir, test_dir, "zh", "en", output_dir)
+    model, tokenizer = marian_train.train_torch()
 
-reference = "The most annoying were some places on his scalp where in the past, at some uncertain date, shiny ringworm scars had appeared."
-references = [[reference.split()]]
+    inference = Inference(
+        model,
+        tokenizer,
+        Path("tests/custom_dataset/chinese/raws"),
+        main_dir,
+        "zh",
+        "en",
+        file_limit=1,
+    )
 
-trained_model = "dugong/models/checkpoint-10"
-tokenizer = MarianTokenizer.from_pretrained("Helsinki-NLP/opus-mt-zh-en")
-translator = pipeline(task="translation", model=trained_model, tokenizer=tokenizer)
-
-model = MarianMTModel.from_pretrained("Helsinki-NLP/opus-mt-zh-en")
-
-text = "最惱人的是在他頭皮上﹐頗有幾處不知起於何時的癩瘡疤。"
-
-base_output = model.generate(tokenizer.encode(text, return_tensors="pt"))
-base_translation = tokenizer.decode(base_output[0], skip_special_tokens=True)
-
-translated_text = [translator(text)[0]["translation_text"].split()]
-
-base_hypotheses = [base_translation.split()]
-base_bleu_score = corpus_bleu(references, base_hypotheses)
-
-print(len(translated_text))
-print(len(base_hypotheses))
-smoother = SmoothingFunction().method4
-base_bleu_score = corpus_bleu(references, base_hypotheses, smoothing_function=smoother)
-trained_bleu_score = corpus_bleu(
-    references, translated_text, smoothing_function=smoother
-)
-
-print(f"BLEU score for base MarianMT translation: {base_bleu_score * 100:.2f}")
-print(f"BLEU score for trained model translation: {trained_bleu_score * 100:.2f}")
+    inference.translate()

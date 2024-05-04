@@ -24,11 +24,11 @@ class Preprocessor:
         self,
         source_lang: str,
         target_lang: str,
-        model: Optional[str] = None,
+        t5: Optional[bool] = False,
         size: Optional[str] = None,
     ):
-        self.model = model
-        self.size = size if model is not None and model.lower() == "t5" else "small"
+        self.t5 = t5
+        self.size = size if t5 is not False else "small"
         self.source_lang = source_lang
         self.target_lang = target_lang
         self.tokenizer, self.checkpoint = self._load_model()
@@ -43,7 +43,7 @@ class Preprocessor:
 
     def _load_model(self) -> Tuple[Union[T5Tokenizer, MarianTokenizer], str]:
         """Loads either a MarianMT or T5 Model and initializes a tokenizer."""
-        if self.model is not None and self.model.lower() == "t5":
+        if self.t5:
             checkpoint = T5_MODELS[self.size.lower()]
             tokenizer = T5Tokenizer.from_pretrained(checkpoint)
         else:
@@ -60,7 +60,7 @@ class Preprocessor:
         """Tokenizes dataset and outputs model inputs."""
         tokenizer = self.tokenizer
 
-        if self.model is not None and self.model.lower() == "t5":
+        if self.t5:
             prefix = self._prefix()
         else:
             prefix = ""
@@ -95,8 +95,7 @@ class Preprocessor:
         """Load dataset from JSON and convert to Hugging Face Dataset format."""
         console = Console()
 
-        with Progress(transient=True) as progress:
-            task = progress.add_task("[cyan]Loading dataset...", total=4)
+        with Progress(transient=True) as _:
 
             dataset = load_dataset(
                 "json",
@@ -105,9 +104,6 @@ class Preprocessor:
                     "test": str(test_path),
                 },
             )
-
-            progress.update(task, advance=1)
-
             if (
                 "corpus" not in dataset["train"].column_names
                 or "corpus" not in dataset["test"].column_names
@@ -116,8 +112,6 @@ class Preprocessor:
                     "Input train or test dataset formatted incorrectly, 'corpus' column not found."
                 )
 
-            progress.update(task, advance=1)
-
             train_dataset = dataset["train"]["corpus"]
             test_dataset = dataset["test"]["corpus"]
 
@@ -125,8 +119,6 @@ class Preprocessor:
                 raise ValueError("Error loading dataset -- train dataset is empty.")
             if len(test_dataset) == 0:
                 raise ValueError("Error loading dataset -- test dataset is empty.")
-
-            progress.update(task, advance=1)
 
             source_sentences = [
                 entry[self.source_lang]
@@ -160,8 +152,6 @@ class Preprocessor:
                     f"{source_lang} and {target_lang} sentences do not match in length in testing set."
                 )
 
-            progress.update(task, advance=1)
-
             train_dataset = train_dataset[0]
             test_dataset = test_dataset[0]
 
@@ -175,7 +165,7 @@ class Preprocessor:
                 )
             preview_panel = Panel(preview_table, title="Dataset Preview", expand=False)
 
-            console.print("\n[green]Dataset loaded successfully![/green]\n")
+            console.print("[green]Dataset loaded successfully![/green]")
             console.print(preview_panel)
 
         return dataset
@@ -186,6 +176,7 @@ class Preprocessor:
 
         train_tokenized_dataset, test_tokenized_dataset = self._tokenize(dataset)
 
+        print("Tokenization complete!")
         return train_tokenized_dataset, test_tokenized_dataset
 
 

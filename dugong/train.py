@@ -112,7 +112,7 @@ class MarianTrainer:
         """TODO: Handle training args here."""
         return
 
-    def train_torch(self):
+    def train_torch(self) -> MarianMTModel:
         """Trains MarianMT model with PyTorch."""
         (
             train_dataset,
@@ -138,7 +138,7 @@ class MarianTrainer:
             logging_steps=1,
             save_steps=1,
             eval_steps=1,
-            max_steps=2,
+            max_steps=1,
         )
         with Progress() as progress:
             task = progress.add_task("[cyan]Training...", total=training_args.max_steps)
@@ -177,6 +177,8 @@ class MarianTrainer:
                 console.print(metrics_panel)
 
         console.print("[green]Training complete![/green]")
+
+        return model, tokenizer
 
 
 class T5Trainer:
@@ -247,7 +249,7 @@ class T5Trainer:
         """TODO: handle T5 training args."""
         return
 
-    def train_torch(self):
+    def train_torch(self) -> T5ForConditionalGeneration:
         """Trains T5 model using PyTorch."""
         (
             train_dataset,
@@ -312,6 +314,8 @@ class T5Trainer:
 
         console.print("[green]Training complete![/green]")
 
+        return model, tokenizer
+
 
 if __name__ == "__main__":
     handler = Handler(
@@ -323,6 +327,6 @@ if __name__ == "__main__":
     output_dir = handler.output_dir()
 
     marian_train = MarianTrainer(train_dir, test_dir, "zh", "en", output_dir)
-    marian_train.train_torch()
+    model = marian_train.train_torch()
 
     # translator = pipeline()
