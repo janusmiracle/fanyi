@@ -1,10 +1,12 @@
 import argparse
 
 from pathlib import Path
+from typing import Optional
 
 from dugong.handler import Handler
 from dugong.inference import Inference
-from dugong.train import MarianTrainer
+from dugong.preprocess import Preprocessor
+from dugong.train import MarianTrainer, T5Trainer
 
 # from dugong.utils import check
 
@@ -28,12 +30,17 @@ def main():
     parser.add_argument(
         "--target", type=str, help="Target language code (e.g. Chinese = 'zh')."
     )
+    parser.add_argument(
+        "--size",
+        type=str,
+        help="The T5 model size (small, base, large, 3b...).",
+    )
 
     # Training
     parser.add_argument(
         "--evaluation-strategy",
         type=str,
-        default="steps",
+        default="epochs",
         help="The evaluation strategy.",
     )
     parser.add_argument(
@@ -77,12 +84,6 @@ def main():
         help="Whether to use 16-bit floating-point precision for training.",
     )
     parser.add_argument(
-        "--max-steps",
-        type=int,
-        default=-1,
-        help="The maximum number of training steps.",
-    )
-    parser.add_argument(
         "--logging-steps",
         type=int,
         default=500,
@@ -97,9 +98,10 @@ def main():
     parser.add_argument(
         "--eval-steps",
         type=int,
-        default=-1,
-        help="The number of steps between evaluations.",
+        default=None,
+        help="The number of steps between evaluations (None for default behavior).",
     )
+
     # Inference
     parser.add_argument(
         "--translate",
@@ -113,61 +115,7 @@ def main():
         default=None,
         help="Maximum number of files to load (only if a directory is passed to --translate).",
     )
-
     args = parser.parse_args()
-
-    # Hell yeah
-    name = args.name
-    train_file = args.train
-    test_file = args.test
-    source_lang = args.source
-    target_lang = args.target
-    evaluation_strategy = args.evaluation_strategy
-    learning_rate = args.learning_rate
-    per_device_train_batch_size = args.per_device_train_batch_size
-    per_device_eval_batch_size = args.per_device_eval_batch_size
-    weight_decay = args.weight_decay
-    save_total_limit = args.save_total_limit
-    num_train_epochs = args.num_train_epochs
-    predict_with_generate = args.predict_with_generate
-    fp16 = args.fp16
-    logging_steps = args.logging_steps
-    save_steps = args.save_steps
-    eval_steps = args.eval_steps
-    translate_path = args.translate
-    file_limit = args.file_limit
-
-    # Run the actual functions
-    handler = Handler(name, train_file, test_file)
-    train_dir, test_dir = handler.import_files()
-    main_dir = handler.source_dir()
-    main_dir = main_dir / "translations"
-    output_dir = handler.output_dir()
-
-    marian_train = MarianTrainer(
-        train_dir, test_dir, source_lang, target_lang, output_dir
-    )
-    training_args = marian_train.training_args(
-        evaluation_strategy,
-        learning_rate,
-        per_device_train_batch_size,
-        per_device_eval_batch_size,
-        weight_decay,
-        save_total_limit,
-        num_train_epochs,
-        predict_with_generate,
-        fp16,
-        logging_steps,
-        save_steps,
-        eval_steps,
-    )
-    model, tokenizer = marian_train.train_torch(training_args)
-
-    inference = Inference(
-        model, tokenizer, translate_path, main_dir, source_lang, target_lang, file_limit
-    )
-
-    inference.translate()
 
 
 if __name__ == "__main__":

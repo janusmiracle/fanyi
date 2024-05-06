@@ -1,13 +1,11 @@
-import itertools
 import shutil
 import os
 
-from nltk.tokenize import sent_tokenize
 from pathlib import Path
-from typing import Optional, Tuple
+from typing import Tuple
 
 from dugong.misc import DATA_PATH
-from dugong.utils import sort_files
+
 
 # from dugong.validations import Validation
 

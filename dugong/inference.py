@@ -27,7 +27,7 @@ class Inference:
         output_dir: Path,
         source_lang: str,
         target_lang: str,
-        file_limit: Optional[int],
+        file_limit: Optional[int] = None,
         t5: Optional[bool] = False,
     ):
         self.model = model

@@ -3,14 +3,11 @@
 Dugong aims to enhance novel translations for readers. 
 
 # Todo
+
+Complete T5 argparsing.
+
+Add standalone translation file.
+
 Update testing.
-
-Add argparsing that includes training options.
-
-Create separate method within Training classes to handle training args.
-
-Add alternative training using TensorFlow.
-
-Add alternative inference using Transformers, PyTorch, Tensorflow.
 
 Complete docs + examples.

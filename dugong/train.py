@@ -108,11 +108,40 @@ class MarianTrainer:
             model,
         )
 
-    def _training_args(self, **kwargs):
-        """TODO: Handle training args here."""
-        return
+    def training_args(
+        self,
+        evaluation_strategy: str = "steps",
+        learning_rate: float = 5e-5,
+        per_device_train_batch_size: int = 8,
+        per_device_eval_batch_size: int = 8,
+        weight_decay: float = 0.0,
+        save_total_limit: int = 5,
+        num_train_epochs: int = 3,
+        predict_with_generate: bool = False,
+        fp16: bool = False,
+        max_steps: int = -1,
+        logging_steps: int = 500,
+        save_steps: int = 500,
+        eval_steps: int = None,
+    ) -> Seq2SeqTrainingArguments:
+        """Seq2SeqTrainingArguments for MarianMT."""
+        return Seq2SeqTrainingArguments(
+            output_dir=self.output_dir,
+            evaluation_strategy=evaluation_strategy,
+            learning_rate=learning_rate,
+            per_device_train_batch_size=per_device_train_batch_size,
+            per_device_eval_batch_size=per_device_eval_batch_size,
+            weight_decay=weight_decay,
+            save_total_limit=save_total_limit,
+            num_train_epochs=num_train_epochs,
+            predict_with_generate=predict_with_generate,
+            fp16=fp16,
+            logging_steps=logging_steps,
+            save_steps=save_steps,
+            eval_steps=eval_steps,
+        )
 
-    def train_torch(self) -> MarianMTModel:
+    def train_torch(self, training_args: Seq2SeqTrainingArguments) -> MarianMTModel:
         """Trains MarianMT model with PyTorch."""
         (
             train_dataset,
@@ -124,22 +153,6 @@ class MarianTrainer:
             model,
         ) = self._setup()
 
-        training_args = Seq2SeqTrainingArguments(
-            output_dir=self.output_dir,
-            evaluation_strategy="steps",
-            learning_rate=2e-5,
-            per_device_train_batch_size=4,
-            per_device_eval_batch_size=4,
-            # weight_decay=0.01,
-            # save_total_limit=3,
-            # num_train_epochs=2,
-            predict_with_generate=True,
-            fp16=False,
-            logging_steps=1,
-            save_steps=1,
-            eval_steps=1,
-            max_steps=1,
-        )
         with Progress() as progress:
             task = progress.add_task("[cyan]Training...", total=training_args.max_steps)
             print("\n")
@@ -245,11 +258,41 @@ class T5Trainer:
             model,
         )
 
-    def _training_args(self):
-        """TODO: handle T5 training args."""
-        return
+    def training_args(
+        self,
+        evaluation_strategy: str = "epochs",
+        learning_rate: float = 5e-5,
+        per_device_train_batch_size: int = 8,
+        per_device_eval_batch_size: int = 8,
+        weight_decay: float = 0.0,
+        save_total_limit: int = 5,
+        num_train_epochs: int = 3,
+        predict_with_generate: bool = False,
+        fp16: bool = False,
+        logging_steps: int = 500,
+        save_steps: int = 500,
+        eval_steps: int = None,
+    ) -> Seq2SeqTrainingArguments:
+        """Seq2SeqTrainingArguments for T5."""
+        return Seq2SeqTrainingArguments(
+            output_dir=self.output_dir,
+            evaluation_strategy=evaluation_strategy,
+            learning_rate=learning_rate,
+            per_device_train_batch_size=per_device_train_batch_size,
+            per_device_eval_batch_size=per_device_eval_batch_size,
+            weight_decay=weight_decay,
+            save_total_limit=save_total_limit,
+            num_train_epochs=num_train_epochs,
+            predict_with_generate=predict_with_generate,
+            fp16=fp16,
+            logging_steps=logging_steps,
+            save_steps=save_steps,
+            eval_steps=eval_steps,
+        )
 
-    def train_torch(self) -> T5ForConditionalGeneration:
+    def train_torch(
+        self, training_args: Seq2SeqTrainingArguments
+    ) -> T5ForConditionalGeneration:
         """Trains T5 model using PyTorch."""
         (
             train_dataset,
@@ -260,19 +303,6 @@ class T5Trainer:
             data_collator,
             model,
         ) = self._setup()
-
-        training_args = Seq2SeqTrainingArguments(
-            output_dir=self.output_dir,
-            evaluation_strategy="epoch",
-            learning_rate=2e-5,
-            per_device_train_batch_size=4,
-            per_device_eval_batch_size=4,
-            weight_decay=0.01,
-            save_total_limit=3,
-            num_train_epochs=2,
-            predict_with_generate=True,
-            fp16=False,
-        )
 
         with Progress() as progress:
             task = progress.add_task(

@@ -30,8 +30,8 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 # Test using cli
-import = "dugong.cli:main"
-train = "dugong.train:main"
+train = "dugong.cli:main"
+t5 = "dugong.t5_cli:main"
 translate = "dugong.translate:main"
 
 # Ruff stuff
