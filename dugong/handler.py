@@ -77,15 +77,3 @@ class Handler:
         return train_directory.joinpath(self.train_file.name), test_directory.joinpath(
             self.test_file.name
         )
-
-
-if __name__ == "__main__":
-    handler = Handler(
-        "corpus",
-        Path("dugong/examples/corpus_train.json"),
-        Path("dugong/examples/corpus_test.json"),
-    )
-    output_directory, q = handler.import_files()
-    print(type(output_directory), q)
-    print(handler.source_dir())
-    print(handler.output_dir())

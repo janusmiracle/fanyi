@@ -5,10 +5,9 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 from transformers import MarianTokenizer, T5Tokenizer
-from typing import Optional, Tuple, Union
+from typing import Tuple, Union
 
 from dugong.handler import Handler
-from dugong.misc import LANGUAGE_CODES, T5_MODELS
 
 
 class Preprocessor:
@@ -24,11 +23,7 @@ class Preprocessor:
         self,
         source_lang: str,
         target_lang: str,
-        t5: Optional[bool] = False,
-        size: Optional[str] = None,
     ):
-        self.t5 = t5
-        self.size = size if t5 is not False else "small"
         self.source_lang = source_lang
         self.target_lang = target_lang
         self.tokenizer, self.checkpoint = self._load_model()
@@ -43,32 +38,17 @@ class Preprocessor:
 
     def _load_model(self) -> Tuple[Union[T5Tokenizer, MarianTokenizer], str]:
         """Loads either a MarianMT or T5 Model and initializes a tokenizer."""
-        if self.t5:
-            checkpoint = T5_MODELS[self.size.lower()]
-            tokenizer = T5Tokenizer.from_pretrained(checkpoint)
-        else:
-            checkpoint = f"Helsinki-NLP/opus-mt-{self.source_lang.lower()}-{self.target_lang.lower()}"
-            tokenizer = MarianTokenizer.from_pretrained(checkpoint)
+        checkpoint = f"Helsinki-NLP/opus-mt-{self.source_lang.lower()}-{self.target_lang.lower()}"
+        tokenizer = MarianTokenizer.from_pretrained(checkpoint)
 
         return tokenizer, checkpoint
-
-    def _prefix(self) -> str:
-        """Set task prefix."""
-        return f"translate {LANGUAGE_CODES[self.source_lang.lower()]} to {LANGUAGE_CODES[self.target_lang.lower()]}: "
 
     def _tokenize(self, dataset: Dataset) -> Tuple[Dataset, Dataset]:
         """Tokenizes dataset and outputs model inputs."""
         tokenizer = self.tokenizer
 
-        if self.t5:
-            prefix = self._prefix()
-        else:
-            prefix = ""
-
-        # + prefix if using T5
         train_inputs = [
-            prefix + example[self.source_lang]
-            for example in dataset["train"]["corpus"][0]
+            example[self.source_lang] for example in dataset["train"]["corpus"][0]
         ]
 
         train_targets = [
@@ -79,8 +59,7 @@ class Preprocessor:
         )
 
         test_inputs = [
-            prefix + example[self.source_lang]
-            for example in dataset["test"]["corpus"][0]
+            example[self.source_lang] for example in dataset["test"]["corpus"][0]
         ]
         test_targets = [
             example[self.target_lang] for example in dataset["test"]["corpus"][0]
@@ -133,7 +112,7 @@ class Preprocessor:
 
             if len(source_sentences) != len(target_sentences):
                 raise ValueError(
-                    f"{source_lang} and {target_lang} sentences do not match in length in training set."
+                    f"{self.source_lang} and {self.target_lang} sentences do not match in length in training set."
                 )
 
             source_sentences = [
@@ -149,7 +128,7 @@ class Preprocessor:
 
             if len(source_sentences) != len(target_sentences):
                 raise ValueError(
-                    f"{source_lang} and {target_lang} sentences do not match in length in testing set."
+                    f"{self.source_lang} and {self.target_lang} sentences do not match in length in testing set."
                 )
 
             train_dataset = train_dataset[0]
@@ -178,30 +157,3 @@ class Preprocessor:
 
         print("Tokenization complete!")
         return train_tokenized_dataset, test_tokenized_dataset
-
-
-if __name__ == "__main__":
-
-    handler = Handler(
-        "willthiswork",
-        Path("dugong/examples/corpus_train.json"),
-        Path("dugong/examples/corpus_test.json"),
-    )
-    train_path, test_path = handler.import_files()
-
-    preprocessor = Preprocessor(source_lang="zh", target_lang="en")
-    tokenizer = preprocessor.get_tokenizer()
-    train_tokenized_dataset, test_tokenized_dataset = preprocessor.preprocess(
-        train_path, test_path
-    )
-    # print(train_tokenized_dataset)
-
-    decoded_dataset1 = tokenizer.batch_decode(
-        test_tokenized_dataset["input_ids"], skip_special_tokens=True
-    )
-    decoded_dataset2 = tokenizer.batch_decode(
-        test_tokenized_dataset["labels"], skip_special_tokens=True
-    )
-    print(decoded_dataset1)
-    # print("DECODED: \n")
-    # print(decoded_dataset.keys())

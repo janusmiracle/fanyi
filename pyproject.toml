@@ -31,8 +31,7 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry.scripts]
 # Test using cli
 train = "dugong.cli:main"
-t5 = "dugong.t5_cli:main"
-translate = "dugong.translate:main"
+translate = "dugong.trcli:main"
 
 # Ruff stuff
 [tool.ruff.lint.per-file-ignores]
