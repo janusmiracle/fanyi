@@ -35,6 +35,7 @@ translate = "dugong.trcli:main"
 
 # Ruff stuff
 [tool.ruff.lint.per-file-ignores]
+ignore = ["E501"]
 "__init__.py" = ["E402"]
 
 [tool.ruff.format]
