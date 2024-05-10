@@ -108,18 +108,18 @@ class MarianTrainer:
     def training_args(
         self,
         evaluation_strategy: str = "steps",
-        learning_rate: float = 5e-5,
-        per_device_train_batch_size: int = 8,
-        per_device_eval_batch_size: int = 8,
-        weight_decay: float = 0.0,
-        save_total_limit: int = 5,
-        num_train_epochs: int = 3,
-        predict_with_generate: bool = False,
+        learning_rate: float = 2e-5,
+        per_device_train_batch_size: int = 4,
+        per_device_eval_batch_size: int = 4,
+        weight_decay: float = 0.01,
+        save_total_limit: int = 1,
+        num_train_epochs: int = 2,
+        predict_with_generate: bool = True,
         fp16: bool = False,
-        max_steps: int = -1,
-        logging_steps: int = 500,
-        save_steps: int = 500,
-        eval_steps: int = None,
+        max_steps: int = 4,
+        logging_steps: int = 1,
+        save_steps: int = 1,
+        eval_steps: int = 1,
     ) -> Seq2SeqTrainingArguments:
         """Seq2SeqTrainingArguments for MarianMT."""
         return Seq2SeqTrainingArguments(
@@ -150,42 +150,32 @@ class MarianTrainer:
             model,
         ) = self._setup()
 
-        with Progress() as progress:
-            task = progress.add_task("[cyan]Training...", total=training_args.max_steps)
-            print("\n")
-            console = Console()
+        trainer = Seq2SeqTrainer(
+            model=model,
+            args=training_args,
+            train_dataset=train_dataset,
+            eval_dataset=test_dataset,
+            tokenizer=tokenizer,
+            data_collator=data_collator,
+            compute_metrics=evaluate.compute_metrics,
+        )
 
-            for epoch in range(training_args.max_steps):
-                trainer = Seq2SeqTrainer(
-                    model=model,
-                    args=training_args,
-                    train_dataset=train_dataset,
-                    eval_dataset=test_dataset,
-                    tokenizer=tokenizer,
-                    data_collator=data_collator,
-                    compute_metrics=lambda eval_preds: evaluate.compute_metrics(
-                        eval_preds
-                    ),
-                )
+        trainer.train()
 
-                trainer.train()
-                progress.update(task, advance=1)
-                metrics = trainer.evaluate()
+        metrics = trainer.evaluate()
 
-                metrics_table = Table(
-                    title="Metrics", show_header=True, header_style="bold magenta"
-                )
-                metrics_table.add_column("Metric", justify="center")
-                metrics_table.add_column("Value", justify="center")
+        console = Console()
+        metrics_table = Table(
+            title="Metrics", show_header=True, header_style="bold magenta"
+        )
+        metrics_table.add_column("Metric", justify="center")
+        metrics_table.add_column("Value", justify="center")
 
-                for metric_name, metric_value in metrics.items():
-                    metrics_table.add_row(metric_name, str(metric_value))
+        for metric_name, metric_value in metrics.items():
+            metrics_table.add_row(metric_name, str(metric_value))
 
-                metrics_panel = Panel(
-                    metrics_table, title="Evaluation Metrics", expand=False
-                )
-                console.print(metrics_panel)
+        metrics_panel = Panel(metrics_table, title="Evaluation Metrics", expand=False)
+        console.print(metrics_panel)
 
         console.print("[green]Training complete![/green]")
-
         return model, tokenizer

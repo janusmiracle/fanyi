@@ -39,7 +39,3 @@ class Evaluate:
         result = {k: round(v, 4) for k, v in result.items()}
 
         return result
-
-
-if __name__ == "__main__":
-    pass
