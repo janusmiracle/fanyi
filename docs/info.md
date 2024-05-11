@@ -11,10 +11,10 @@ $ poetry shell
 ```
 
 # Usage
-Dugong is a tool for fine-tuning MarianMT models and using them for inference on translation tasks. It offers two main scripts: train and translate.
+Dugong is a tool for fine-tuning MarianMT models and using them for inference on translation tasks. It offers two main scripts: `train` and `translate`.
 
 ## Dataset
-To train a model, first, create your custom dataset in the following format:
+To train a model, first, create your custom dataset in the following JSON format:
 
 ```json
 {
@@ -78,9 +78,9 @@ options:
   --file-limit FILE_LIMIT
                         Maximum number of files to load (only if a directory is passed to --translate).
 ```
-Dugong offers a few training parameters from HuggingFace Trainer. If there any others you wish to use, submit an Issue/PR or add them manually by editing `train.py` and `cli.py`.
+Dugong offers a few training parameters from HuggingFace Trainer. If there are any others you wish to use, submit an Issue/PR or add them manually by editing `train.py` and `cli.py`.
 
-An example of running the training and inference without any training parameters set:
+An example of training and using them for inference inference without any training parameters set:
 
 ```
 $ poetry run train --name Book --train dugong/examples/train_small.json --test dugong/examples/test_small.json --source zh --target en --translate tests/custom_dataset/chinese/raws/ --file-limit 1
@@ -122,7 +122,7 @@ File 1 translation complete. Translation stored as translation-1.txt in /Users/u
 Model checkpoints and translations are outputted to `dugong/data/<name>`.
 
 ## Translations
-For translation, use the translate script. Provide a file or directory of files to be translated:
+For translation, use the `poetry run translate` script. Provide a file or directory of files to be translated:
 ```
 $ poetry run translate --help   
 usage: translate [-h] [--files FILES] [--name NAME] [--source SOURCE] [--target TARGET] [--file-limit FILE_LIMIT]
