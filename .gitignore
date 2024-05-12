@@ -2,4 +2,5 @@ dugong/__pycache__/
 tests/__pycache__/
 tests/custom_dataset/
 dugong/old/
+tests/
 poetry.lock
